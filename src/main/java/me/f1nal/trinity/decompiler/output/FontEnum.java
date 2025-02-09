@@ -7,20 +7,24 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public enum FontEnum implements INameable {
-    JETBRAINS_MONO("JetBrains Mono"),
-    ZED_MONO("Zed Mono"),
-    INTER("Inter"),
-    ;
+    JETBRAINS_MONO("JetBrains Mono", "JetBrainsMonoNL-Regular.ttf"),
+    ZED_MONO("Zed Mono", "JetBrainsMonoNL-Regular.ttf"),
+    INTER("Inter", "inter-regular.ttf");
 
     private final String name;
+    private final String path;
 
-    FontEnum(String name) {
+    FontEnum(String name, String path) {
         this.name = name;
+        this.path = path;
     }
 
     @Override
     public String getName() {
         return this.name;
+    }
+    public String getPath() {
+        return this.path;
     }
 
     public static FontEnum getFont(String name) {

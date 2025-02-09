@@ -20,7 +20,6 @@ public class FontManager {
 
         this.buildFonts(Main.getPreferences().getDefaultFont());
         this.buildFonts(Main.getPreferences().getDecompilerFont());
-
         this.resourceCache = null;
     }
 
@@ -31,19 +30,27 @@ public class FontManager {
         final ImGuiIO io = ImGui.getIO();
         final ImFontConfig fontConfig = new ImFontConfig();
         fontConfig.setMergeMode(true);
-        final ImFontGlyphRangesBuilder rangesBuilder = new ImFontGlyphRangesBuilder();
+        ImFontGlyphRangesBuilder rangesBuilder = new ImFontGlyphRangesBuilder();
         rangesBuilder.addRanges(io.getFonts().getGlyphRangesDefault());
+        rangesBuilder.addRanges(io.getFonts().getGlyphRangesCyrillic());
         rangesBuilder.addRanges(FontAwesomeIcons._IconRange);
-        final short[] glyphRanges = rangesBuilder.buildRanges();
+        short[] glyphRanges = rangesBuilder.buildRanges();
 
-        fontSettings.registerFont(FontEnum.INTER, io.getFonts().addFontFromMemoryTTF(loadFromResources("inter-regular.ttf"), size));
+        this.addTextFont(FontEnum.INTER, fontSettings, io, fontConfig, glyphRanges, size);
+        fontConfig.setMergeMode(true);
         fontSettings.setIconFont(io.getFonts().addFontFromMemoryTTF(loadFromResources("fa-solid-900.ttf"), size, fontConfig, glyphRanges));
+        this.addTextFont(FontEnum.JETBRAINS_MONO, fontSettings, io, fontConfig, glyphRanges, size);
+        fontConfig.setMergeMode(true);
+        fontSettings.setIconFont(io.getFonts().addFontFromMemoryTTF(loadFromResources("fa-solid-900.ttf"), size, fontConfig, glyphRanges));
+        this.addTextFont(FontEnum.ZED_MONO, fontSettings, io, fontConfig, glyphRanges, size);
+        fontConfig.setMergeMode(true);
+        fontSettings.setIconFont(io.getFonts().addFontFromMemoryTTF(loadFromResources("fa-solid-900.ttf"), size, fontConfig, glyphRanges));
+    }
 
-        fontSettings.registerFont(FontEnum.JETBRAINS_MONO, io.getFonts().addFontFromMemoryTTF(loadFromResources("JetBrainsMonoNL-Regular.ttf"), size));
-        fontSettings.setIconFont(io.getFonts().addFontFromMemoryTTF(loadFromResources("fa-solid-900.ttf"), size, fontConfig, glyphRanges));
-
-        fontSettings.registerFont(FontEnum.ZED_MONO, io.getFonts().addFontFromMemoryTTF(loadFromResources("zed-mono-regular.ttf"), size));
-        fontSettings.setIconFont(io.getFonts().addFontFromMemoryTTF(loadFromResources("fa-solid-900.ttf"), size, fontConfig, glyphRanges));
+    private void addTextFont(FontEnum fontEnum, FontSettings fontSettings,
+                             ImGuiIO io, ImFontConfig fontConfig, short[] glyphRanges, float size) {
+        fontConfig.setMergeMode(false);
+        fontSettings.registerFont(fontEnum, io.getFonts().addFontFromMemoryTTF(loadFromResources(fontEnum.getPath()), size, fontConfig, glyphRanges));
     }
 
     private byte[] loadFromResources(String name) {
