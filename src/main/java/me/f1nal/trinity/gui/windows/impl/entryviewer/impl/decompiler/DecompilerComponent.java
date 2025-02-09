@@ -36,6 +36,7 @@ public class DecompilerComponent {
      */
     private Runnable customRenderer;
     private Input<?> viewMember;
+
     // Temporary
     public Input<?> input;
     public String memberKey;
@@ -148,6 +149,10 @@ public class DecompilerComponent {
 
     public int getColor() {
         return colorFunction.get();
+    }
+
+    public Input<?> getInput() {
+        return this.input;
     }
 
     public void setText(String text) {

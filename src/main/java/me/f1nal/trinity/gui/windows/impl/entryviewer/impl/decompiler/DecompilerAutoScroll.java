@@ -6,11 +6,14 @@ import me.f1nal.trinity.execution.Input;
 import java.util.List;
 
 public class DecompilerAutoScroll {
-    private final Input<?> input;
+    private Input<?> input;
     private DecompilerComponent component;
     private boolean found;
 
-    public DecompilerAutoScroll(DecompilerWindow window, Input<?> input) {
+    public DecompilerAutoScroll(Input<?> input) {
+        if (input == null) {
+            throw new IllegalArgumentException("Input cannot be null");
+        }
         this.input = input;
     }
 
@@ -20,6 +23,10 @@ public class DecompilerAutoScroll {
             this.found = true;
         }
         return getComponent();
+    }
+
+    public void setComponent(DecompilerComponent component) {
+        this.component = component;
     }
 
     public DecompilerComponent getComponent() {
@@ -40,7 +47,6 @@ public class DecompilerAutoScroll {
         final int indexOf = componentList.indexOf(marker);
         for (int i = indexOf + 1; i < Math.min(indexOf + 20, componentList.size()); i++) {
             DecompilerComponent component = componentList.get(i);
-
             if (component.memberKey != null && component.memberKey.equals(this.input.toString())) {
                 return component;
             }

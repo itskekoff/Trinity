@@ -32,6 +32,7 @@ public class ProjectBrowserFrame extends StaticWindow implements IEventListener 
     private ListFilterComponent<IBrowserViewerNode> filterComponent;
     private String search;
     private ProjectBrowserTreeNodePackage rootNode;
+    private final Object lock = new Object();
 
     public ProjectBrowserFrame(Trinity trinity) {
         super("Project Browser", 600, 460, trinity);
@@ -74,11 +75,7 @@ public class ProjectBrowserFrame extends StaticWindow implements IEventListener 
 
     @Override
     protected void renderFrame() {
-        if (this.filterComponent == null) {
-            this.filterComponent = new ListFilterComponent<>(createViewerList(), this.searchBarFilter, this.kindFilter);
-            this.filterComponent.addFilterChangeListener(this::setNodeRoot);
-        }
-
+        this.ensureFilterNonNull();
         this.filterComponent.draw();
         this.search = this.searchBarFilter.getSearchBar().getSearchText().get();
 
@@ -108,6 +105,15 @@ public class ProjectBrowserFrame extends StaticWindow implements IEventListener 
     }
 
     private Set<IBrowserViewerNode> filteredSet;
+
+    private void ensureFilterNonNull() {
+        synchronized (lock) {
+            if (this.filterComponent == null) {
+                this.filterComponent = new ListFilterComponent<>(createViewerList(), this.searchBarFilter, this.kindFilter);
+                this.filterComponent.addFilterChangeListener(this::setNodeRoot);
+            }
+        }
+    }
 
     private void setNodeRoot() {
         this.filteredSet = new HashSet<>(this.filterComponent.getFilteredList());

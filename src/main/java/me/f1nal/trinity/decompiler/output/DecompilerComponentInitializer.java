@@ -292,7 +292,6 @@ public class DecompilerComponentInitializer implements OutputMemberVisitor {
         final String unquotedText = string.getData();
 
         component.addPopupBuilder(builder -> builder.menuItem("Copy", () -> SystemUtil.copyToClipboard(unquotedText))
-
                 .menuItem("Search All Occurrences...", () -> {
                     Trinity trinity = Main.getTrinity();
                     ConstantSearchTypeString constantSearchType = new ConstantSearchTypeString(trinity);

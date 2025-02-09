@@ -6,8 +6,10 @@ import me.f1nal.trinity.execution.MethodInput;
 import org.objectweb.asm.tree.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class EditingInstruction {
     private final AbstractInsnNode insnNode;
@@ -40,35 +42,97 @@ public class EditingInstruction {
     }
 
     public void addInstructionFields(MethodInput methodInput) {
-        if (insnNode instanceof TypeInsnNode) {
-            editFieldList.add(new EditFieldDescriptor(() -> ((TypeInsnNode) insnNode).desc, (desc) -> ((TypeInsnNode) insnNode).desc = desc));
-        } else if (insnNode instanceof IntInsnNode) {
-            editFieldList.add(new EditFieldInteger("Operand", () -> ((IntInsnNode) insnNode).operand, (operand) -> ((IntInsnNode) insnNode).operand = operand, ImGuiDataType.S32));
-        } else if (insnNode instanceof VarInsnNode) {
-            editFieldList.add(new EditFieldVariable(methodInput.getVariableTable(), () -> methodInput.getVariableTable().getVariable(((VarInsnNode) insnNode).var), (variable) -> ((VarInsnNode) insnNode).var = variable.findIndex()));
-        } else if (insnNode instanceof IincInsnNode) {
-            editFieldList.add(new EditFieldVariable(methodInput.getVariableTable(), () -> methodInput.getVariableTable().getVariable(((IincInsnNode) insnNode).var), (variable) -> ((IincInsnNode) insnNode).var = variable.findIndex()));
-            editFieldList.add(new EditFieldInteger("Increment", () -> ((IincInsnNode) insnNode).incr, (incr) -> ((IincInsnNode) insnNode).incr = incr, ImGuiDataType.S32));
-        } else if (insnNode instanceof MultiANewArrayInsnNode) {
-            editFieldList.add(new EditFieldDescriptor(() -> ((MultiANewArrayInsnNode) insnNode).desc, (desc) -> ((MultiANewArrayInsnNode) insnNode).desc = desc));
-            editFieldList.add(new EditFieldInteger("Dimensions", () -> ((MultiANewArrayInsnNode) insnNode).dims, (dim) -> ((MultiANewArrayInsnNode) insnNode).dims = dim, ImGuiDataType.U8));
-        } else if (insnNode instanceof JumpInsnNode) {
-            editFieldList.add(new EditFieldLabel(methodInput.getLabelTable(), () -> methodInput.getLabelTable().getLabel(((JumpInsnNode) insnNode).label.getLabel()), (label) -> ((JumpInsnNode) insnNode).label = new LabelNode(label.findOriginal())));
-        } else if(insnNode instanceof MethodInsnNode min) {
-            editFieldList.add(new EditFieldClass(trinity, "Owner", () -> min.owner, owner -> min.owner = owner));
-            editFieldList.add(new EditFieldString(512, "Name", "Method name", () -> min.name, name -> min.name = name));
-            editFieldList.add(new EditFieldString(512, "Desc", "Method description", () -> min.desc, desc -> min.desc = desc));
-        } else if(insnNode instanceof FieldInsnNode fin) {
-            editFieldList.add(new EditFieldClass(trinity, "Field owner", () -> fin.owner, owner -> fin.owner = owner));
-            editFieldList.add(new EditFieldString(512, "Name", "Field name", () -> fin.name, name -> fin.name = name));
-            editFieldList.add(new EditFieldString(512, "Desc", "Field description", () -> fin.desc, desc -> fin.desc = desc));
-        }
+        Map<Class<?>, Consumer<AbstractInsnNode>> handlers = new HashMap<>();
 
-        for (EditField<?> editField : editFieldList) {
-            editField.setUpdateEvent(this::update);
+        addHandler(handlers, TypeInsnNode.class, typeInsn -> {
+            addField(new EditFieldDescriptor(() -> typeInsn.desc, desc -> typeInsn.desc = desc));
+        });
+
+        addHandler(handlers, IntInsnNode.class, intInsn -> addField(new EditFieldInteger("Operand",
+                () -> intInsn.operand, operand -> intInsn.operand = operand, ImGuiDataType.S32)));
+
+        addHandler(handlers, VarInsnNode.class, varInsn -> {
+            addField(new EditFieldVariable(methodInput.getVariableTable(),
+                    () -> methodInput.getVariableTable().getVariable(varInsn.var),
+                    variable -> varInsn.var = variable.findIndex()));
+        });
+
+        addHandler(handlers, IincInsnNode.class, iincInsn -> {
+            addField(new EditFieldVariable(methodInput.getVariableTable(),
+                    () -> methodInput.getVariableTable().getVariable(iincInsn.var),
+                    variable -> iincInsn.var = variable.findIndex()));
+            addField(new EditFieldInteger("Increment", () -> iincInsn.incr, incr -> iincInsn.incr = incr, ImGuiDataType.S32));
+        });
+
+        addHandler(handlers, MultiANewArrayInsnNode.class, multiANewArrayInsn -> {
+            addField(new EditFieldDescriptor(() -> multiANewArrayInsn.desc, desc -> multiANewArrayInsn.desc = desc));
+            addField(new EditFieldInteger("Dimensions",
+                    () -> multiANewArrayInsn.dims, dim -> multiANewArrayInsn.dims = dim, ImGuiDataType.U8));
+        });
+
+        addHandler(handlers, JumpInsnNode.class, jumpInsn ->
+                addField(new EditFieldLabel(methodInput.getLabelTable(),
+                        () -> methodInput.getLabelTable().getLabel(jumpInsn.label.getLabel()),
+                        label -> jumpInsn.label = new LabelNode(label.findOriginal()))));
+
+        addHandler(handlers, MethodInsnNode.class, methodInsn -> {
+            addField(new EditFieldClass(trinity, "Owner",
+                    () -> methodInsn.owner, owner -> methodInsn.owner = owner));
+            addField(new EditFieldString(512, "Name", "Method name",
+                    () -> methodInsn.name, name -> methodInsn.name = name));
+            addField(new EditFieldString(512, "Desc", "Method description",
+                    () -> methodInsn.desc, desc -> methodInsn.desc = desc));
+        });
+
+        addHandler(handlers, FieldInsnNode.class, fieldInsn -> {
+            addField(new EditFieldClass(trinity, "Field owner",
+                    () -> fieldInsn.owner, owner -> fieldInsn.owner = owner));
+            addField(new EditFieldString(512, "Name", "Field name",
+                    () -> fieldInsn.name, name -> fieldInsn.name = name));
+            addField(new EditFieldString(512, "Desc", "Field description",
+                    () -> fieldInsn.desc, desc -> fieldInsn.desc = desc));
+        });
+        addHandler(handlers, LdcInsnNode.class, ldcInsn ->
+                addField(new EditFieldObject<>("Constant", () -> ldcInsn.cst, cst -> ldcInsn.cst = cst)));
+
+        /*
+        // idk how to make correct
+        addHandler(handlers, InvokeDynamicInsnNode.class, indyInsn -> {
+            addField(new EditFieldString(512, "Name", "InvokeDynamic name",
+                    () -> indyInsn.name, name -> indyInsn.name = name));
+            addField(new EditFieldString(512, "Desc", "InvokeDynamic description",
+                    () -> indyInsn.desc, desc -> indyInsn.desc = desc));
+            addField(new EditFieldHandle("Bootstrap Method",
+                    () -> indyInsn.bsm, bsm -> indyInsn.bsm = bsm));
+        });
+         */
+
+        addHandler(handlers, FrameNode.class, frameInsn ->
+                addField(new EditFieldInteger("Type",
+                        () -> frameInsn.type, type -> frameInsn.type = type, ImGuiDataType.S32)));
+        addHandler(handlers, LineNumberNode.class, lineInsn ->
+                addField(new EditFieldInteger("Line",
+                        () -> lineInsn.line, lineNum -> lineInsn.line = lineNum, ImGuiDataType.S32)));
+
+        Consumer<AbstractInsnNode> handler = handlers.get(insnNode.getClass());
+        if (handler != null) {
+            handler.accept(insnNode);
         }
 
         this.update();
+    }
+
+    private <T extends AbstractInsnNode> void addHandler(Map<Class<?>, Consumer<AbstractInsnNode>> handlers, Class<T> clazz,
+                                                         Consumer<T> handler) {
+        handlers.put(clazz, insn -> {
+            if (clazz.isInstance(insn)) {
+                handler.accept(clazz.cast(insn));
+            }
+        });
+    }
+    private void addField(EditField<?> field) {
+        editFieldList.add(field);
+        field.setUpdateEvent(this::update);
     }
 
     private boolean computeValid() {
