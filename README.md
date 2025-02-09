@@ -23,7 +23,8 @@ However, there are [binaries (usually outdated) available which you can get from
 - Deobfuscation
 
 ## Authors
-- [@final](https://www.github.com/firstfault- [@itskekoff](https://github.com/itskekoff) (fork)
+- [@final](https://www.github.com/firstfault)
+- [@itskekoff](https://github.com/itskekoff) (fork)
 
 ### Contributing
 Contributions are massively appreciated. Please feel free to open an issue or pull request if anything you need is missing.
