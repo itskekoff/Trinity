@@ -6,11 +6,11 @@ Trinity is a powerful lightning-fast software reverse engineering suite for the 
 ## Building
 I highly recommend running Trinity from source:
 ```bash
-git clone https://github.com/firstfault/Trinity.git
+git clone https://github.com/itskekoff/Trinity.git
 cd Trinity
 ./gradlew run
 ```
-However, there are [binaries (usually outdated) available which you can get from here](https://github.com/firstfault/Trinity/releases).
+However, there are [binaries (usually outdated) available which you can get from here](https://github.com/itskekoff/Trinity/releases).
 
 ## Features
 - Databases
@@ -23,7 +23,7 @@ However, there are [binaries (usually outdated) available which you can get from
 - Deobfuscation
 
 ## Authors
-- [@final](https://www.github.com/firstfault)
+- [@final](https://www.github.com/firstfault- [@itskekoff](https://github.com/itskekoff) (fork)
 
 ### Contributing
 Contributions are massively appreciated. Please feel free to open an issue or pull request if anything you need is missing.
@@ -36,7 +36,7 @@ Please review the [planned features](PLANNED.md) before requesting a feature add
 - Modified version of [Fernflower Decompiler](https://www.jetbrains.com/)
 
 #### Who is this meant for?
-Hackers, hobbyists, professionals, everyone is welcome.
+Hackers, hobbyists, professionals, femboys - everyone is welcome.
 
 #### Context
 Originally Trinity started out as an obfuscator with an interactive interface. Over time, I began using it as a decompiler, and eventually it evolved into this awesome tool.
