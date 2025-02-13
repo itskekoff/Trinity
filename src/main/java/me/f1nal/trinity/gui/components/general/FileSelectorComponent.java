@@ -2,6 +2,7 @@ package me.f1nal.trinity.gui.components.general;
 
 import imgui.ImGui;
 import imgui.type.ImString;
+import jnafilechooser.api.JnaFileChooser;
 import me.f1nal.trinity.gui.components.ComponentId;
 import me.f1nal.trinity.util.GuiUtil;
 
@@ -28,13 +29,13 @@ public class FileSelectorComponent {
 
     public void draw() {
         ImGui.text(this.label);
+        ImGui.inputText("###" + this.componentId, this.path);
         ImGui.sameLine();
         if (ImGui.smallButton("...")) {
             File result = this.openFileChooser();
             if (result != null) this.path.set(result);
         }
         GuiUtil.tooltip("Open File Chooser");
-        ImGui.inputText("###" + this.componentId, this.path);
     }
 
     public File getFile() {
@@ -46,24 +47,18 @@ public class FileSelectorComponent {
     }
 
     public File openFileChooser() {
-        FileDialog fd = new FileDialog((java.awt.Frame) null, "Choose a file", mode);
-        fd.setDirectory(lastDirectory != null ? lastDirectory : getParentFromPath());
-        fd.setFilenameFilter(this.filenameFilter);
-        fd.setFile(path.get());
-        fd.setVisible(true);
-        if (fd.getDirectory() != null) this.lastDirectory = fd.getDirectory();
-        if (fd.getFiles().length == 0) {
-            return null;
+        JnaFileChooser fc = new JnaFileChooser();
+        fc.addFilter("Java files", "zip", "jar");
+        fc.addFilter("All Files", "*");
+        fc.setCurrentDirectory(lastDirectory != null ? lastDirectory : getParentFromPath());
+        fc.setDefaultFileName(path.get());
+        if (fc.showOpenDialog(null)) {
+            if (fc.getCurrentDirectory() != null) {
+                this.lastDirectory = fc.getCurrentDirectory().getAbsolutePath();
+            }
+            return fc.getSelectedFile();
         }
-        File file = fd.getFiles()[0];
-        if (mode != FileDialog.SAVE && !file.exists()) {
-            return null;
-        }
-        File directory = file.getParentFile();
-        if (directory.exists() && directory.isDirectory()) {
-            lastDirectory = directory.getAbsolutePath();
-        }
-        return file;
+        return null;
     }
 
     private String getParentFromPath() {

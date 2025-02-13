@@ -22,6 +22,10 @@ public class FullRenamePackages extends FullRenameMember {
                 continue;
             }
 
+            if (pkg.getName().equals("META-INF")) {
+                continue;
+            }
+
             context.renames().add(new Rename(pkg::rename, generateName()));
         }
     }
