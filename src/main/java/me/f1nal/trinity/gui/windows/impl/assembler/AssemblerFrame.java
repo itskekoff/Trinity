@@ -68,7 +68,7 @@ public final class AssemblerFrame extends ClosableWindow implements ICaption {
     private boolean methodNotFresh, saveMethod;
 
     public AssemblerFrame(Trinity trinity, MethodInput methodInput, Instruction2SourceMapping sourceMapping) {
-        super("Assembler (beta!): " + methodInput.getName() + methodInput.getDescriptor(), 660, 500, trinity);
+        super("Assembler " + methodInput.getName() + methodInput.getDescriptor(), 660, 500, trinity);
         this.methodInput = methodInput;
         this.sourceMapping = sourceMapping;
         this.setInstructions();
@@ -89,6 +89,12 @@ public final class AssemblerFrame extends ClosableWindow implements ICaption {
         this.decoder = new AssemblerInstructionDecoder(this, methodInput);
         this.instructions = this.decoder.buildInstructions(methodInput.getInstructions());
         this.instructions.setIdsIfReset();
+    }
+
+    private void copyInstructions() {
+        StringBuilder builder = new StringBuilder();
+        this.instructions.forEach(instruction -> builder.append(getInstructionRawText(instruction)).append("\n"));
+        SystemUtil.copyToClipboard(builder.toString());
     }
 
     @Override
@@ -162,8 +168,8 @@ public final class AssemblerFrame extends ClosableWindow implements ICaption {
                     file.menuItem("Save", "Ctrl+S", this.methodNotFresh, () -> this.saveMethod = true);
                 }).
                 menu("View", view -> {
-                    view.menuItem("Refresh", this::setInstructions)
-                    ;
+                    view.menuItem("Refresh", this::setInstructions);
+                    view.menuItem("Copy", this::copyInstructions);
                 }).
                 menu("Bytecode", bytecode -> {
                     bytecode.menuItem("Insert First...", () -> this.openInsertDialog(0))
@@ -190,6 +196,7 @@ public final class AssemblerFrame extends ClosableWindow implements ICaption {
 
     private void clearAll() {
         this.addHistory(new InstructionClearHistory(instructions));
+        instructions.getInstructionReferenceArrowList().clear();
         instructions.clear();
         instructions.queueIdReset();
     }

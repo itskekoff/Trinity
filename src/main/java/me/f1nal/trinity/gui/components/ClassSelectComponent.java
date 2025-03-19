@@ -17,6 +17,7 @@ public class ClassSelectComponent {
     private ClassTarget classInput;
     private final Predicate<ClassTarget> validClassPredicate;
     private final String componentName;
+    private String hint = "java/lang/Object";
 
     public ClassSelectComponent(Trinity trinity, String componentName, Predicate<ClassTarget> validClassPredicate) {
         this.trinity = trinity;
@@ -35,7 +36,7 @@ public class ClassSelectComponent {
     public boolean draw() {
         final String oldClassName = getClassName();
 
-        if (ImGui.inputTextWithHint(componentName + "###ClassName" + id, "java/lang/Object", className)) {
+        if (ImGui.inputTextWithHint(componentName + "###ClassName" + id, this.hint, className)) {
             this.queryClassInput();
         }
         ImGui.sameLine();
@@ -51,6 +52,10 @@ public class ClassSelectComponent {
 
     public void setClassName(String className) {
         this.className.set(className);
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
     }
 
     private void queryClassInput() {

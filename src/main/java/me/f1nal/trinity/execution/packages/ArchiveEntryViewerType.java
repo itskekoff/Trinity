@@ -16,8 +16,7 @@ import java.util.function.Predicate;
 public enum ArchiveEntryViewerType implements INameable {
     DECOMPILER("Decompiler", e -> e instanceof ClassTarget, DecompilerWindow.class, e -> new DecompilerWindow((ClassTarget) e, Main.getTrinity())),
     TEXT_VIEWER("Text Viewer", e -> e instanceof ResourceArchiveEntry, TextEditorWindow.class, e -> new TextEditorWindow(Main.getTrinity(), (ResourceArchiveEntry) e)),
-    HEX_VIEWER("Hex Viewer", e -> e instanceof ResourceArchiveEntry, HexEditWindow.class, e -> new HexEditWindow(Main.getTrinity(), (ResourceArchiveEntry) e)),
-    ;
+    HEX_VIEWER("Hex Viewer", e -> e instanceof ResourceArchiveEntry, HexEditWindow.class, e -> new HexEditWindow(Main.getTrinity(), (ResourceArchiveEntry) e)),;
 
     private final String name;
     private final Predicate<ArchiveEntry> valid;

@@ -78,18 +78,18 @@ public class EditingInstruction {
         addHandler(handlers, MethodInsnNode.class, methodInsn -> {
             addField(new EditFieldClass(trinity, "Owner",
                     () -> methodInsn.owner, owner -> methodInsn.owner = owner));
-            addField(new EditFieldString(512, "Name", "Method name",
+            addField(new EditFieldString(512, "Name", "toString",
                     () -> methodInsn.name, name -> methodInsn.name = name));
-            addField(new EditFieldString(512, "Desc", "Method description",
+            addField(new EditFieldString(512, "Desc", "()Ljava/lang/String",
                     () -> methodInsn.desc, desc -> methodInsn.desc = desc));
         });
 
         addHandler(handlers, FieldInsnNode.class, fieldInsn -> {
-            addField(new EditFieldClass(trinity, "Field owner",
-                    () -> fieldInsn.owner, owner -> fieldInsn.owner = owner));
-            addField(new EditFieldString(512, "Name", "Field name",
+            addField(new EditFieldClass(trinity, "Owner",
+                    () -> fieldInsn.owner, owner -> fieldInsn.owner = owner).setHint("java/lang/String"));
+            addField(new EditFieldString(512, "Name", "value",
                     () -> fieldInsn.name, name -> fieldInsn.name = name));
-            addField(new EditFieldString(512, "Desc", "Field description",
+            addField(new EditFieldString(512, "Desc", "[B",
                     () -> fieldInsn.desc, desc -> fieldInsn.desc = desc));
         });
         addHandler(handlers, LdcInsnNode.class, ldcInsn ->

@@ -65,10 +65,9 @@ public class EnumFieldsGlobalRename extends GlobalRenameType {
         if ((nxt = nxt.getNext()).getOpcode() != Opcodes.DUP) {
             return;
         }
-        if (!((nxt = nxt.getNext()) instanceof LdcInsnNode) || !(((LdcInsnNode) nxt).cst instanceof String)) {
+        if (!((nxt = nxt.getNext()) instanceof LdcInsnNode) || !(((LdcInsnNode) nxt).cst instanceof String cst)) {
             return;
         }
-        String cst = (String) ((LdcInsnNode) nxt).cst;
         if (!InstructionUtil.isIntegerInstruction((nxt = nxt.getNext()))) {
             return;
         }

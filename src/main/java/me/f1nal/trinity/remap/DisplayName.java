@@ -47,4 +47,9 @@ public class DisplayName {
     public void setType(RenameType type) {
         this.type = Objects.requireNonNull(type, "Rename type cannot be null");
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

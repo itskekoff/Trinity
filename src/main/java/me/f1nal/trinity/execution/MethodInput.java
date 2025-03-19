@@ -47,7 +47,7 @@ public final class MethodInput extends MemberInput<MethodNode> implements IDatab
     public Map<LabelNode, LabelNode> createLabelMap() {
         final Map<LabelNode, LabelNode> map = new HashMap<>();
         for (AbstractInsnNode instruction : getNode().instructions) {
-            if(instruction instanceof LabelNode labelNode) map.put(labelNode, labelNode);
+            if (instruction instanceof LabelNode labelNode) map.put(labelNode, labelNode);
         }
 
         return map;

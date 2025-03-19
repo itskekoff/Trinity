@@ -76,7 +76,7 @@ public class ProjectBrowserFrame extends StaticWindow implements IEventListener 
     @Override
     protected void renderFrame() {
         this.ensureFilterNonNull();
-        this.filterComponent.draw();
+        if (this.filterComponent != null) this.filterComponent.draw();
         this.search = this.searchBarFilter.getSearchBar().getSearchText().get();
 
         ImGui.separator();
@@ -107,11 +107,9 @@ public class ProjectBrowserFrame extends StaticWindow implements IEventListener 
     private Set<IBrowserViewerNode> filteredSet;
 
     private void ensureFilterNonNull() {
-        synchronized (lock) {
-            if (this.filterComponent == null) {
-                this.filterComponent = new ListFilterComponent<>(createViewerList(), this.searchBarFilter, this.kindFilter);
-                this.filterComponent.addFilterChangeListener(this::setNodeRoot);
-            }
+        if (this.filterComponent == null) {
+            this.filterComponent = new ListFilterComponent<>(createViewerList(), this.searchBarFilter, this.kindFilter);
+            this.filterComponent.addFilterChangeListener(this::setNodeRoot);
         }
     }
 

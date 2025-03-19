@@ -64,16 +64,14 @@ public class SafeClassWriter extends ClassWriter {
             if ((info1.access & Opcodes.ACC_INTERFACE) != 0) {
                 if (typeImplements(type2, info2, type1)) {
                     return type1;
-                } else {
-                    return "java/lang/Object";
                 }
+                return "java/lang/Object";
             }
             if ((info2.access & Opcodes.ACC_INTERFACE) != 0) {
                 if (typeImplements(type1, info1, type2)) {
                     return type2;
-                } else {
-                    return "java/lang/Object";
                 }
+                return "java/lang/Object";
             }
             StringBuilder b1 = typeAncestors(type1, info1);
             StringBuilder b2 = typeAncestors(type2, info2);
@@ -83,8 +81,7 @@ public class SafeClassWriter extends ClassWriter {
             while (true) {
                 int start1 = b1.lastIndexOf(";", end1 - 1);
                 int start2 = b2.lastIndexOf(";", end2 - 1);
-                if (start1 != -1 && start2 != -1
-                        && end1 - start1 == end2 - start2) {
+                if (start1 != -1 && start2 != -1 && end1 - start1 == end2 - start2) {
                     String p1 = b1.substring(start1 + 1, end1);
                     String p2 = b2.substring(start2 + 1, end2);
                     if (p1.equals(p2)) {
@@ -99,10 +96,10 @@ public class SafeClassWriter extends ClassWriter {
                 }
             }
         } catch (TypeNotPresentException e) {
-            console.warn("Unable to find common super class between {} and {} because {} isn't in the class path. Fallback to java/lang/Object", type1, type2, e.typeName());
+            console.warn("Type not found: {}. Fallback to java/lang/Object", e.typeName());
             return "java/lang/Object";
         } catch (IOException e) {
-            console.warn("Unable to find common super class between {} and {}. Fallback to java/lang/Object", type1, type2);
+            console.warn("IO error for {} and {}. Fallback to java/lang/Object", type1, type2);
             return "java/lang/Object";
         }
     }

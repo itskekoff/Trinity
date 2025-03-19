@@ -31,4 +31,9 @@ public final class EditFieldClass extends EditField<String> {
         final var className = classSelectComponent.getClassName();
         return className != null && !className.isEmpty();
     }
+
+    public EditFieldClass setHint(String hint) {
+        this.classSelectComponent.setHint(hint);
+        return this;
+    }
 }

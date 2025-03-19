@@ -48,7 +48,8 @@ public class FileSelectorComponent {
 
     public File openFileChooser() {
         JnaFileChooser fc = new JnaFileChooser();
-        fc.addFilter("Java files", "zip", "jar");
+        fc.addFilter("Java files", "zip", "jar", "class");
+        fc.addFilter("Text files", "txt", "json", "yml");
         fc.addFilter("All Files", "*");
         fc.setCurrentDirectory(lastDirectory != null ? lastDirectory : getParentFromPath());
         fc.setDefaultFileName(path.get());

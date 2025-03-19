@@ -25,6 +25,11 @@ public class AssemblerHistoryFrame extends ClosableWindow {
 
     @Override
     protected void renderFrame() {
+        if (assemblerFrame.getHistory().isEmpty()) {
+            ImGui.setCursorPosX(ImGui.getCursorPosX() + 4);
+            ImGui.text("Assembler history is empty. Try to delete/add instructions.");
+            return;
+        }
         ImGui.pushStyleVar(ImGuiStyleVar.CellPadding, 0.F, 4.F);
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 8.F);
         ImGui.pushStyleColor(ImGuiCol.HeaderHovered, 0);

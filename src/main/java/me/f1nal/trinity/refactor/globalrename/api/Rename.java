@@ -8,6 +8,8 @@ public final class Rename {
     private final RenameHandler handler;
     private final String newName;
 
+    private String formattedName;
+
     public Rename(RenameHandler handler, String newName) {
         this.handler = handler;
         this.newName = newName;

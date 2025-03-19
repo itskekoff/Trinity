@@ -166,11 +166,12 @@ public class InstructionComponent {
             popup.menuItem(instructionAction.getName(), instructionAction.getKeyName(), false, () -> instructionAction.execute(af, this));
         }
 
-        popup.separator();
-
-        if (getId() != 0) popup.menuItem("Move Up", () -> af.moveInstruction(this, -1));
-        if (getId() != af.getInstructions().size() - 1) popup.menuItem("Move Down", () -> af.moveInstruction(this, 1));
-
+        if (getId() != 0 || getId() != af.getInstructions().size() - 1) {
+            popup.separator();
+            if (getId() != 0) popup.menuItem("Move Up", () -> af.moveInstruction(this, -1));
+            if (getId() != af.getInstructions().size() - 1)
+                popup.menuItem("Move Down", () -> af.moveInstruction(this, 1));
+        }
         popup.separator();
 
         popup.menuItem("Copy Text", () -> af.copyTextInstruction(this));

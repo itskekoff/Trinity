@@ -62,6 +62,8 @@ public class ClassWriterTask {
                 } catch (Throwable throwable) {
                     executorService.shutdown();
                     throwable.printStackTrace();
+                    finish.run();
+                    console.error("Error in class %s: %s".formatted(classNode.name, throwable.getMessage()));
                     return;
                 }
 

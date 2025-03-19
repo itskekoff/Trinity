@@ -6,12 +6,13 @@ import me.f1nal.trinity.execution.MemberInput;
 import me.f1nal.trinity.execution.MethodInput;
 import me.f1nal.trinity.gui.components.MemorableCheckboxComponent;
 import me.f1nal.trinity.refactor.globalrename.api.GlobalRenameContext;
+import me.f1nal.trinity.refactor.globalrename.impl.fullrename.FullGlobalRename;
 
 public abstract class FullRenameClassMember<I extends MemberInput<?>> extends FullRenameMember {
     private final Class<I> type;
 
-    protected FullRenameClassMember(String label, String namePrefix, Class<I> type) {
-        super(label, namePrefix);
+    protected FullRenameClassMember(FullGlobalRename parent, String label, String namePrefix, Class<I> type) {
+        super(parent, label, namePrefix);
         this.type = type;
     }
 

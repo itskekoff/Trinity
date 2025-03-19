@@ -1,8 +1,10 @@
 package me.f1nal.trinity.gui.windows.impl;
 
 import imgui.ImGui;
+import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiTableColumnFlags;
 import imgui.flag.ImGuiTableFlags;
+import imgui.type.ImBoolean;
 import me.f1nal.trinity.Trinity;
 import me.f1nal.trinity.execution.ClassTarget;
 import me.f1nal.trinity.gui.components.SearchBar;
@@ -16,7 +18,7 @@ public class ClassPickerPopup extends PopupWindow {
     private final SearchBar searchBar = new SearchBar();
     private final Predicate<ClassTarget> valid;
     private final Consumer<ClassTarget> consumer;
-
+    private final ImBoolean exactSearch = new ImBoolean(false);
     public ClassPickerPopup(Trinity trinity, Predicate<ClassTarget> valid, Consumer<ClassTarget> consumer) {
         super("Class Picker", trinity);
         this.valid = valid;
@@ -26,9 +28,22 @@ public class ClassPickerPopup extends PopupWindow {
     @Override
     protected void renderFrame() {
         String search = searchBar.drawAndGet();
+        ImGui.sameLine();
+
+        float fixedWidth = 430.0f;
+        float checkboxWidth = 20.0f;
+        float posX = fixedWidth - checkboxWidth;
+        ImGui.setCursorPosX(posX);
+
+        ImGui.checkbox("##", exactSearch);
+        if (ImGui.isItemHovered()) {
+            ImGui.beginTooltip();
+            ImGui.text("Enable exact phrase matching");
+            ImGui.endTooltip();
+        }
         ClassTarget input = null;
         ImGui.beginChild("class search child" + getPopupId(), 430, 200);
-        if (!ImGui.beginTable("class search table" + getPopupId(), 1, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Sortable)) {
+        if (!ImGui.beginTable("class search table" + getPopupId(), 1, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit)) {
             return;
         }
         ImGui.tableSetupColumn("Name", ImGuiTableColumnFlags.NoResize);
@@ -39,7 +54,7 @@ public class ClassPickerPopup extends PopupWindow {
             }
 
             String name = className.getValue().getDisplayOrRealName();
-            if (name.contains(search)) {
+            if ((!this.exactSearch.get() && name.contains(search)) || this.exactSearch.get() && name.equals(search)) {
                 if (input == null) input = className.getValue();
                 ImGui.tableNextRow();
                 ImGui.tableSetColumnIndex(0);

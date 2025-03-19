@@ -24,6 +24,7 @@ import java.util.List;
 
 public class GlobalRenameWindow extends StaticWindow implements ICaption {
     private final ListBoxComponent<GlobalRenameType> listBox;
+    private List<Rename> lastRenames = new ArrayList<>();
 
     public GlobalRenameWindow(Trinity trinity) {
         super("Global Rename", 0, 0, trinity);
@@ -58,6 +59,14 @@ public class GlobalRenameWindow extends StaticWindow implements ICaption {
                 this.runRefactor();
             }
             ImGui.sameLine();
+            boolean disabled = this.lastRenames.isEmpty();
+            ImGui.beginDisabled(disabled);
+            if (ImGui.button("Export Mappings")) {
+                this.exportMappings();
+            }
+            ImGui.endDisabled();
+
+            ImGui.sameLine();
             trinity.getRemapper().getNameHeuristics().getEnabledCheckbox().draw();
             GuiUtil.informationTooltip("Detect if the name is obfuscated before renaming");
         }
@@ -72,8 +81,13 @@ public class GlobalRenameWindow extends StaticWindow implements ICaption {
         GlobalRenameContext context = new GlobalRenameContext(trinity.getExecution(), renames, nameHeuristics);
         type.refactor(context);
         renames.forEach(rename -> rename.rename(trinity.getRemapper()));
+        this.lastRenames = renames;
         Main.getEventBus().post(new EventRefreshDecompilerText(dc -> true));
         Main.getDisplayManager().addNotification(new Notification(NotificationType.INFO, this, ColoredStringBuilder.create().fmt("Automatically renamed {} objects", renames.size()).get()));
+    }
+
+    private void exportMappings() {
+
     }
 
     @Override

@@ -130,7 +130,7 @@ public class ContextUnit {
         for (int i = 0; i < classes.size(); i++) {
           StructClass cl = classes.get(i);
           String entryName = decompiledData.getClassEntryName(cl, classEntries.get(i));
-          if (entryName != null) {
+            if (entryName != null) {
             String content = decompiledData.getClassContent(cl);
             resultSaver.saveClassEntry(archivePath, filename, cl.qualifiedName, entryName, content);
           }

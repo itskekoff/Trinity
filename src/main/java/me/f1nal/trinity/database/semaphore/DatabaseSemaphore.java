@@ -40,6 +40,7 @@ public class DatabaseSemaphore implements ICaption {
                         Main.getDisplayManager().addNotification(new Notification(NotificationType.ERROR, DatabaseSemaphore.this,
                                 ColoredStringBuilder.create()
                                         .fmt("Failed to %s database: {}".formatted(save ? "save" : "load"), throwable).get()));
+                        throwable.printStackTrace();
                         lastRun.reset();
                         future.complete(false);
                         return;
