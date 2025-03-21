@@ -5,10 +5,7 @@ import me.f1nal.trinity.logging.Logging;
 import me.f1nal.trinity.util.ByteUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;

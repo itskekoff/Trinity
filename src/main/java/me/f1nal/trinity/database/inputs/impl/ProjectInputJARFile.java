@@ -36,7 +36,7 @@ public class ProjectInputJARFile extends AbstractProjectInputFile {
                 hasEntry = true;
 
                 if (!jarEntry.isDirectory() || entryBytes.length != 0) {
-                    if (entryName.endsWith(".class")) {
+                    if (isClass(entryName, entryBytes)) {
                         this.getClassPath().getClasses().add(new UnreadClassBytes(entryName, entryBytes));
                     } else {
                         this.getClassPath().putResource(entryName, entryBytes);
@@ -68,6 +68,12 @@ public class ProjectInputJARFile extends AbstractProjectInputFile {
         } catch (Throwable throwable) {
             Logging.warn("Failed to set CRC field! {}", throwable);
         }
+    }
+
+    public static boolean isClass(String fileName, byte[] bytes) {
+        return bytes.length >= 4 && String
+                .format("%02X%02X%02X%02X", bytes[0], bytes[1], bytes[2], bytes[3]).equals("CAFEBABE") && (
+                       fileName.endsWith(".class") || fileName.endsWith(".class/"));
     }
 
     private static class ZeroCRC32 extends CRC32 {
