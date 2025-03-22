@@ -1,6 +1,7 @@
 package me.f1nal.trinity.gui.windows.impl.classstructure.nodes;
 
 import me.f1nal.trinity.Main;
+import me.f1nal.trinity.Trinity;
 import me.f1nal.trinity.decompiler.main.ClassesProcessor;
 import me.f1nal.trinity.decompiler.output.colors.ColoredString;
 import me.f1nal.trinity.decompiler.output.colors.ColoredStringBuilder;
@@ -10,6 +11,8 @@ import me.f1nal.trinity.execution.access.SimpleAccessFlagsMaskProvider;
 import me.f1nal.trinity.gui.components.popup.PopupItemBuilder;
 import me.f1nal.trinity.gui.viewport.notifications.Notification;
 import me.f1nal.trinity.gui.viewport.notifications.NotificationType;
+import me.f1nal.trinity.gui.windows.impl.classstructure.popup.edit.EditFieldPopup;
+import me.f1nal.trinity.gui.windows.impl.classstructure.popup.edit.EditMethodPopup;
 import me.f1nal.trinity.gui.windows.impl.cp.BrowserViewerNode;
 import me.f1nal.trinity.gui.windows.impl.cp.RenameHandler;
 import me.f1nal.trinity.gui.windows.impl.entryviewer.impl.decompiler.DecompilerWindow;
@@ -31,11 +34,18 @@ public abstract class AbstractClassStructureNodeInput<I extends Input> extends C
 
     @Override
     protected void populatePopup(PopupItemBuilder popup) {
+        Trinity trinity = Main.getTrinity();
         popup.separator();
 
         getInput().populatePopup(popup);
         if (!(this.input instanceof ClassInput)) {
             popup.separator();
+            switch (this.input.getNode().getClass().getSimpleName()) {
+                case "MethodNode" -> popup.menuItem("Edit method", () ->
+                        Main.getDisplayManager().getWindowManager().addPopup(new EditMethodPopup((MethodInput) this.input, trinity)));
+                case "FieldNode" -> popup.menuItem("Edit field", () ->
+                        Main.getDisplayManager().getWindowManager().addPopup(new EditFieldPopup((FieldInput) this.input, trinity)));
+            }
 
             popup.menuItem("Remove", () -> {
                 ClassInput owner = this.input.getOwningClass();

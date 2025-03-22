@@ -32,6 +32,8 @@ public final class ClassInput extends Input<ClassNode> implements IDisplayNamePr
     private final ClassTarget classTarget;
     private final ClassHierarchy classHierarchy = new ClassHierarchy(this);
 
+    private int size;
+
     public ClassInput(Execution execution, ClassNode classNode, ClassTarget classTarget) {
         super(classNode);
         this.interfaces = Objects.requireNonNullElse(classNode.interfaces, Collections.emptyList());
@@ -213,6 +215,13 @@ public final class ClassInput extends Input<ClassNode> implements IDisplayNamePr
     @Override
     public String toString() {
         return this.getRealName();
+    }
+
+    public int getSize() {
+        return size;
+    }
+    public void setSize(int size) {
+        this.size = size;
     }
 
     private static final Map<String, Function<Input<?>, String>> COPYABLE_ELEMENTS = new LinkedHashMap<>() {{

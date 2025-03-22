@@ -79,6 +79,8 @@ public class ClassInputReaderLoadTask extends ProgressiveLoadTask implements ICa
         ClassTarget classTarget = new ClassTarget(classNode.name, length);
         ClassInput classInput = new ClassInput(execution, classNode, classTarget);
         classTarget.setInput(classInput);
+        classInput.setSize(length);
+
         tasks.add(() -> {
             classTarget.setPackage(execution.getRootPackage());
             execution.getClassList().add(classInput);

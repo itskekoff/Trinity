@@ -5,7 +5,6 @@ import me.f1nal.trinity.Trinity;
 import me.f1nal.trinity.events.EventRefreshDecompilerText;
 import me.f1nal.trinity.execution.access.AccessFlagsMaskProvider;
 import me.f1nal.trinity.gui.components.popup.PopupItemBuilder;
-import me.f1nal.trinity.gui.windows.impl.cp.IRenameHandler;
 import me.f1nal.trinity.gui.windows.impl.cp.RenameHandler;
 import me.f1nal.trinity.gui.windows.impl.xref.builder.IXrefBuilderProvider;
 import me.f1nal.trinity.remap.DisplayName;
@@ -16,10 +15,9 @@ import me.f1nal.trinity.util.SystemUtil;
 
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public abstract class Input<N> implements AccessFlagsMaskProvider, RenameHandler, IXrefBuilderProvider, IDisplayNameProvider {
-    private final N node;
+    private N node;
     private final AccessFlags accessFlags;
 
     protected Input(N node) {
@@ -29,6 +27,10 @@ public abstract class Input<N> implements AccessFlagsMaskProvider, RenameHandler
 
     public final N getNode() {
         return node;
+    }
+
+    public void setNode(N node) {
+        this.node = node;
     }
 
     public final AccessFlags getAccessFlags() {

@@ -170,6 +170,10 @@ public final class Execution {
         return classTarget;
     }
 
+    public void removeClassTarget(ClassTarget classTarget) {
+        this.classTargetMap.remove(classTarget.getRealName());
+    }
+
     /**
      * Retrieves the reference map containing all references.
      *

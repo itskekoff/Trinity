@@ -1,14 +1,16 @@
 package me.f1nal.trinity.gui.windows.impl.classstructure.nodes;
 
 import me.f1nal.trinity.Main;
+import me.f1nal.trinity.Trinity;
 import me.f1nal.trinity.decompiler.output.colors.ColoredStringBuilder;
 import me.f1nal.trinity.execution.AccessFlags;
 import me.f1nal.trinity.execution.ClassInput;
 import me.f1nal.trinity.gui.components.FontAwesomeIcons;
 import me.f1nal.trinity.gui.components.popup.PopupItemBuilder;
 import me.f1nal.trinity.gui.windows.impl.classstructure.StructureKind;
-import me.f1nal.trinity.gui.windows.impl.classstructure.popup.AddFieldPopup;
-import me.f1nal.trinity.gui.windows.impl.classstructure.popup.AddMethodPopup;
+import me.f1nal.trinity.gui.windows.impl.classstructure.popup.add.AddFieldPopup;
+import me.f1nal.trinity.gui.windows.impl.classstructure.popup.add.AddMethodPopup;
+import me.f1nal.trinity.gui.windows.impl.classstructure.popup.edit.EditClassPopup;
 import me.f1nal.trinity.theme.CodeColorScheme;
 
 public class ClassStructureNodeClass extends AbstractClassStructureNodeInput<ClassInput> {
@@ -60,9 +62,12 @@ public class ClassStructureNodeClass extends AbstractClassStructureNodeInput<Cla
 
     @Override
     protected void populatePopup(PopupItemBuilder popup) {
+        Trinity trinity = Main.getTrinity();
         super.populatePopup(popup);
+
         popup.separator();
-        popup.menuItem("Add method", () -> Main.getWindowManager().addPopup(new AddMethodPopup(this.getInput(), Main.getTrinity())));
-        popup.menuItem("Add field", () -> Main.getWindowManager().addPopup(new AddFieldPopup(this.getInput(), Main.getTrinity())));
+        popup.menuItem("Edit class", () -> Main.getWindowManager().addPopup(new EditClassPopup(this.getInput(), trinity)));
+        popup.menuItem("Add method", () -> Main.getWindowManager().addPopup(new AddMethodPopup(this.getInput(), trinity)));
+        popup.menuItem("Add field", () -> Main.getWindowManager().addPopup(new AddFieldPopup(this.getInput(), trinity)));
     }
 }

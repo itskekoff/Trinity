@@ -1,4 +1,4 @@
-package me.f1nal.trinity.gui.windows.impl.classstructure.popup;
+package me.f1nal.trinity.gui.windows.impl.classstructure.popup.add;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;

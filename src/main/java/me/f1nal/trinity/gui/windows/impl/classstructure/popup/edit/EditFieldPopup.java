@@ -1,4 +1,4 @@
-package me.f1nal.trinity.gui.windows.impl.classstructure.popup;
+package me.f1nal.trinity.gui.windows.impl.classstructure.popup.edit;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -10,6 +10,7 @@ import me.f1nal.trinity.decompiler.output.colors.ColoredStringBuilder;
 import me.f1nal.trinity.events.EventClassModified;
 import me.f1nal.trinity.execution.ClassInput;
 import me.f1nal.trinity.execution.FieldInput;
+import me.f1nal.trinity.execution.MethodInput;
 import me.f1nal.trinity.gui.viewport.notifications.Notification;
 import me.f1nal.trinity.gui.viewport.notifications.NotificationType;
 import me.f1nal.trinity.gui.windows.api.PopupWindow;
@@ -19,28 +20,37 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.FieldNode;
 
-/**
- * @author itskekoff
- * @since 20:15 of 22.03.2025
- */
-public class AddFieldPopup extends PopupWindow {
+public class EditFieldPopup extends PopupWindow {
     private final ImString fieldName = new ImString(32);
     private final ImString fieldType = new ImString(64);
     private final ImString initialValue = new ImString(64);
-    private final ImBoolean isPublic = new ImBoolean(true);
-    private final ImBoolean isPrivate = new ImBoolean(false);
-    private final ImBoolean isProtected = new ImBoolean(false);
-    private final ImBoolean isStatic = new ImBoolean(false);
-    private final ImBoolean isFinal = new ImBoolean(false);
-    private final ImBoolean isVolatile = new ImBoolean(false);
+    private final ImBoolean isPublic = new ImBoolean();
+    private final ImBoolean isPrivate = new ImBoolean();
+    private final ImBoolean isProtected = new ImBoolean();
+    private final ImBoolean isStatic = new ImBoolean();
+    private final ImBoolean isFinal = new ImBoolean();
+    private final ImBoolean isVolatile = new ImBoolean();
 
     private final ClassInput classInput;
+    private final FieldInput fieldInput;
     private final Trinity trinity;
 
-    public AddFieldPopup(ClassInput classInput, Trinity trinity) {
-        super("Add New Field", trinity);
-        this.classInput = classInput;
+    public EditFieldPopup(FieldInput fieldInput, Trinity trinity) {
+        super("Edit Field", trinity);
+        this.fieldInput = fieldInput;
+        this.classInput = fieldInput.getOwningClass();
         this.trinity = trinity;
+
+        FieldNode node = fieldInput.getNode();
+        fieldName.set(node.name);
+        fieldType.set(node.desc);
+        initialValue.set(node.value != null ? node.value.toString() : "");
+        isPublic.set((node.access & Opcodes.ACC_PUBLIC) != 0);
+        isPrivate.set((node.access & Opcodes.ACC_PRIVATE) != 0);
+        isProtected.set((node.access & Opcodes.ACC_PROTECTED) != 0);
+        isStatic.set((node.access & Opcodes.ACC_STATIC) != 0);
+        isFinal.set((node.access & Opcodes.ACC_FINAL) != 0);
+        isVolatile.set((node.access & Opcodes.ACC_VOLATILE) != 0);
     }
 
     @Override
@@ -94,13 +104,11 @@ public class AddFieldPopup extends PopupWindow {
         boolean isValid = DescriptorValidator.validateFieldDescriptor(fieldType.get(), error);
         DescriptorValidator.renderError(error.toString());
 
-        if (ImGui.button("Add Field") && isValid && !fieldName.get().isEmpty()) {
-            FieldNode fieldNode = this.createField();
-            this.classInput.getNode().fields.add(fieldNode);
-            this.classInput.addInput(new FieldInput(fieldNode, this.classInput));
-            trinity.getEventManager().postEvent(new EventClassModified(this.classInput));
-            Main.getDisplayManager().addNotification(new Notification(NotificationType.SUCCESS, () -> "Field generator", ColoredStringBuilder.create()
-                    .fmt("Created field {} in {}", generateFieldPreview(), this.classInput.getDisplaySimpleName()).get()));
+        if (ImGui.button("Save Changes") && isValid && !fieldName.get().isEmpty()) {
+            updateField();
+            trinity.getEventManager().postEvent(new EventClassModified(classInput));
+            Main.getDisplayManager().addNotification(new Notification(NotificationType.SUCCESS, () -> "Field editor", ColoredStringBuilder.create()
+                    .fmt("Updated field {} in {}", generateFieldPreview(), classInput.getDisplaySimpleName()).get()));
             Main.getWindowManager().getWindowsOfType(DecompilerWindow.class).forEach(DecompilerWindow::updateClassStructure);
 
             close();
@@ -125,12 +133,12 @@ public class AddFieldPopup extends PopupWindow {
 
         String typeStr;
         if (fieldType.get().isEmpty()) {
-            typeStr = "<type>";
+            typeStr = "int";
         } else {
             try {
                 Type type = Type.getType(fieldType.get());
                 typeStr = DescriptorValidator.typeToString(type);
-            } catch (StringIndexOutOfBoundsException | IllegalArgumentException e) {
+            } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
                 typeStr = "<invalid>";
             }
         }
@@ -147,15 +155,19 @@ public class AddFieldPopup extends PopupWindow {
         return preview.toString();
     }
 
-    public String getFieldName() {
-        return fieldName.get();
+    private void updateField() {
+        FieldNode fieldNode = fieldInput.getNode();
+        fieldNode.name = fieldName.get();
+        fieldNode.desc = fieldType.get().isEmpty() ? "I" : fieldType.get();
+        fieldNode.access = getAccessFlags();
+        fieldNode.value = getInitialValue();
+
+        this.classInput.removeInput(this.fieldInput);
+        this.classInput.getNode().fields.add(fieldNode);
+        this.classInput.addInput(new FieldInput(fieldNode, this.classInput));
     }
 
-    public String getFieldType() {
-        return fieldType.get();
-    }
-
-    public int getAccessFlags() {
+    private int getAccessFlags() {
         int access = 0;
         if (isPublic.get()) access |= Opcodes.ACC_PUBLIC;
         if (isPrivate.get()) access |= Opcodes.ACC_PRIVATE;
@@ -166,7 +178,7 @@ public class AddFieldPopup extends PopupWindow {
         return access;
     }
 
-    public Object getInitialValue() {
+    private Object getInitialValue() {
         if (initialValue.get().isEmpty()) return null;
         try {
             Type type = Type.getType(fieldType.get().isEmpty() ? "I" : fieldType.get());
@@ -182,14 +194,5 @@ public class AddFieldPopup extends PopupWindow {
         } catch (Exception e) {
             return initialValue.get();
         }
-    }
-
-    private FieldNode createField() {
-        String name = this.getFieldName();
-        String desc = this.getFieldType().isEmpty() ? "I" : this.getFieldType();
-        int access = this.getAccessFlags();
-        Object value = this.getInitialValue();
-
-        return new FieldNode(access, name, desc, null, value);
     }
 }
