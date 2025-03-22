@@ -1,7 +1,7 @@
 package me.f1nal.trinity.gui.windows.impl.ldc.types;
 
 import imgui.flag.ImGuiDataType;
-import me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.EditFieldInteger;
+import me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.impl.EditFieldInteger;
 import me.f1nal.trinity.gui.windows.impl.ldc.CstType;
 
 public class CstTypeByte extends CstType<Byte> {

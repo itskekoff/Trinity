@@ -8,7 +8,7 @@ public abstract class EditField<T> {
     private final Consumer<T> setterConsumer;
     private Runnable updateEvent;
 
-    EditField(Supplier<T> getterSupplier, Consumer<T> setter) {
+    public EditField(Supplier<T> getterSupplier, Consumer<T> setter) {
         this.getterSupplier = getterSupplier;
         this.setterConsumer = setter;
     }
@@ -25,7 +25,7 @@ public abstract class EditField<T> {
      */
     public abstract boolean isValidInput();
 
-    protected final T get() {
+    public final T get() {
         return getterSupplier.get();
     }
 

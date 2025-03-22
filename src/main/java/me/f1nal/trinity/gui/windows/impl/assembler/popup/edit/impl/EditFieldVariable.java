@@ -1,9 +1,10 @@
-package me.f1nal.trinity.gui.windows.impl.assembler.popup.edit;
+package me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.impl;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import me.f1nal.trinity.execution.var.Variable;
 import me.f1nal.trinity.execution.var.VariableTable;
+import me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.InvalidEditInputException;
 import me.f1nal.trinity.theme.CodeColorScheme;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
 public class EditFieldVariable extends EditFieldText<Variable> {
     private final VariableTable table;
 
-    EditFieldVariable(VariableTable table, Supplier<Variable> getter, Consumer<Variable> setter) {
+    public EditFieldVariable(VariableTable table, Supplier<Variable> getter, Consumer<Variable> setter) {
         super(100, "Variable", "var0", getter, setter);
         this.table = table;
     }

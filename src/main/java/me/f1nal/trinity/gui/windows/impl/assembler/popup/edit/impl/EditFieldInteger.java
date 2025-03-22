@@ -1,7 +1,8 @@
-package me.f1nal.trinity.gui.windows.impl.assembler.popup.edit;
+package me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.impl;
 
 import imgui.ImGui;
 import imgui.type.ImInt;
+import me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.EditField;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;

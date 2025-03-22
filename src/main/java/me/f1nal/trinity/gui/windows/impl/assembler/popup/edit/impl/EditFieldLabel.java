@@ -1,9 +1,10 @@
-package me.f1nal.trinity.gui.windows.impl.assembler.popup.edit;
+package me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.impl;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import me.f1nal.trinity.execution.labels.LabelTable;
 import me.f1nal.trinity.execution.labels.MethodLabel;
+import me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.InvalidEditInputException;
 import me.f1nal.trinity.theme.CodeColorScheme;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
 public class EditFieldLabel extends EditFieldText<MethodLabel> {
     private final LabelTable table;
 
-    EditFieldLabel(LabelTable table, Supplier<MethodLabel> getter, Consumer<MethodLabel> setter) {
+    public EditFieldLabel(LabelTable table, Supplier<MethodLabel> getter, Consumer<MethodLabel> setter) {
         super(100, "Label Name", "L0", getter, setter);
         this.table = table;
     }

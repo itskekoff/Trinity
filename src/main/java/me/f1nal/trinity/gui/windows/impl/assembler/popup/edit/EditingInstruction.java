@@ -3,6 +3,7 @@ package me.f1nal.trinity.gui.windows.impl.assembler.popup.edit;
 import imgui.flag.ImGuiDataType;
 import me.f1nal.trinity.Trinity;
 import me.f1nal.trinity.execution.MethodInput;
+import me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.impl.*;
 import org.objectweb.asm.tree.*;
 
 import java.util.ArrayList;
@@ -15,9 +16,6 @@ public class EditingInstruction {
     private final AbstractInsnNode insnNode;
     private final List<EditField<?>> editFieldList = new ArrayList<>();
     private final Trinity trinity;
-    /**
-     * If this instruction data is valid and can be set.
-     */
     private boolean valid;
 
     public EditingInstruction(Trinity trinity, Map<LabelNode, LabelNode> labelMap, AbstractInsnNode insnNode) {
@@ -92,24 +90,25 @@ public class EditingInstruction {
             addField(new EditFieldString(512, "Desc", "[B",
                     () -> fieldInsn.desc, desc -> fieldInsn.desc = desc));
         });
-        addHandler(handlers, LdcInsnNode.class, ldcInsn ->
-                addField(new EditFieldObject<>("Constant", () -> ldcInsn.cst, cst -> ldcInsn.cst = cst)));
 
-        /*
-        // idk how to make correct
+        addHandler(handlers, LdcInsnNode.class, ldcInsn ->
+                addField(new EditFieldConstant<>("Constant", () -> ldcInsn.cst, cst -> ldcInsn.cst = cst)));
+
         addHandler(handlers, InvokeDynamicInsnNode.class, indyInsn -> {
-            addField(new EditFieldString(512, "Name", "InvokeDynamic name",
+            addField(new EditFieldString(512, "Name", "invokeDynamic",
                     () -> indyInsn.name, name -> indyInsn.name = name));
-            addField(new EditFieldString(512, "Desc", "InvokeDynamic description",
+            addField(new EditFieldString(512, "Descriptor", "()V",
                     () -> indyInsn.desc, desc -> indyInsn.desc = desc));
-            addField(new EditFieldHandle("Bootstrap Method",
+            addField(new EditFieldConstant<>("Bootstrap Method",
                     () -> indyInsn.bsm, bsm -> indyInsn.bsm = bsm));
+            addField(new EditFieldObjectArray("Bootstrap Arguments",
+                    () -> indyInsn.bsmArgs, args -> indyInsn.bsmArgs = args));
         });
-         */
 
         addHandler(handlers, FrameNode.class, frameInsn ->
                 addField(new EditFieldInteger("Type",
                         () -> frameInsn.type, type -> frameInsn.type = type, ImGuiDataType.S32)));
+
         addHandler(handlers, LineNumberNode.class, lineInsn ->
                 addField(new EditFieldInteger("Line",
                         () -> lineInsn.line, lineNum -> lineInsn.line = lineNum, ImGuiDataType.S32)));
@@ -130,6 +129,7 @@ public class EditingInstruction {
             }
         });
     }
+
     private void addField(EditField<?> field) {
         editFieldList.add(field);
         field.setUpdateEvent(this::update);

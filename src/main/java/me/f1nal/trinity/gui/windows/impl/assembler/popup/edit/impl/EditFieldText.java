@@ -1,8 +1,10 @@
-package me.f1nal.trinity.gui.windows.impl.assembler.popup.edit;
+package me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.impl;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.type.ImString;
+import me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.EditField;
+import me.f1nal.trinity.gui.windows.impl.assembler.popup.edit.InvalidEditInputException;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -13,7 +15,7 @@ public abstract class EditFieldText<T> extends EditField<T> {
     protected int inputTextFlags = ImGuiInputTextFlags.None;
     private Boolean valid;
 
-    EditFieldText(int length, String label, String hint, Supplier<T> getter, Consumer<T> setter) {
+    public EditFieldText(int length, String label, String hint, Supplier<T> getter, Consumer<T> setter) {
         super(getter, setter);
         this.text = new ImString(length);
         this.label = label;
