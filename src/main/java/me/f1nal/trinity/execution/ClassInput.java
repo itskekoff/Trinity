@@ -1,5 +1,6 @@
 package me.f1nal.trinity.execution;
 
+import me.f1nal.trinity.Main;
 import me.f1nal.trinity.execution.hierarchy.ClassHierarchy;
 import me.f1nal.trinity.execution.xref.XrefMap;
 import me.f1nal.trinity.gui.components.popup.PopupItemBuilder;
@@ -11,6 +12,7 @@ import me.f1nal.trinity.util.NameUtil;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
 
 import java.util.*;
 import java.util.function.Function;
@@ -64,6 +66,18 @@ public final class ClassInput extends Input<ClassNode> implements IDisplayNamePr
         addInput(input.getDetails(), input);
     }
 
+    public void removeInput(MemberInput<?> input) {
+        final MemberDetails details = input.getDetails();
+        final String memberKey = this.getMemberKey(details.getName(), details.getDesc());
+        if (input instanceof MethodInput methodInput) {
+            methodList.remove(memberKey);
+            getNode().methods.remove(methodInput.getNode());
+        } else {
+            fieldList.remove(memberKey);
+            getNode().fields.remove(((FieldInput) input).getNode());
+        }
+    }
+
     private void addInput(MemberDetails query, MemberInput<?> input) {
         final MemberDetails details = input.getDetails();
         final String memberKey = this.getMemberKey(details.getName(), details.getDesc());
@@ -86,7 +100,7 @@ public final class ClassInput extends Input<ClassNode> implements IDisplayNamePr
 
     @Override
     public void populatePopup(PopupItemBuilder builder) {
-//        builder.menuItem("View Hierarchy", () -> Main.getWindowManager().addClosableWindow(new ClassHierarchyWindow(this.getOwningClass().getExecution().getTrinity(), this)));
+        // builder.menuItem("View Hierarchy", () -> Main.getWindowManager().addClosableWindow(new ClassHierarchyWindow(this.getOwningClass().getExecution().getTrinity(), this)));
         super.populatePopup(builder);
     }
 

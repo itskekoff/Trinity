@@ -132,7 +132,7 @@ public class DecompilerWindow extends ArchiveEntryViewerWindow<ClassTarget> impl
         this.updateClassStructure();
     }
 
-    private void updateClassStructure() {
+    public void updateClassStructure() {
         if (this.selectedClass != null) {
             Main.getWindowManager().addStaticWindow(ClassStructureWindow.class).setClassStructure(new ClassStructure(this.selectedClass));
         }

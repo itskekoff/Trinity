@@ -1,15 +1,18 @@
 package me.f1nal.trinity.gui.windows.impl.classstructure.nodes;
 
 import me.f1nal.trinity.Main;
+import me.f1nal.trinity.decompiler.main.ClassesProcessor;
 import me.f1nal.trinity.decompiler.output.colors.ColoredString;
 import me.f1nal.trinity.decompiler.output.colors.ColoredStringBuilder;
-import me.f1nal.trinity.execution.AccessFlags;
-import me.f1nal.trinity.execution.ClassTarget;
-import me.f1nal.trinity.execution.Input;
+import me.f1nal.trinity.events.EventClassModified;
+import me.f1nal.trinity.execution.*;
 import me.f1nal.trinity.execution.access.SimpleAccessFlagsMaskProvider;
 import me.f1nal.trinity.gui.components.popup.PopupItemBuilder;
+import me.f1nal.trinity.gui.viewport.notifications.Notification;
+import me.f1nal.trinity.gui.viewport.notifications.NotificationType;
 import me.f1nal.trinity.gui.windows.impl.cp.BrowserViewerNode;
 import me.f1nal.trinity.gui.windows.impl.cp.RenameHandler;
+import me.f1nal.trinity.gui.windows.impl.entryviewer.impl.decompiler.DecompilerWindow;
 import me.f1nal.trinity.logging.Logging;
 import me.f1nal.trinity.theme.CodeColorScheme;
 import me.f1nal.trinity.util.NameUtil;
@@ -31,6 +34,19 @@ public abstract class AbstractClassStructureNodeInput<I extends Input> extends C
         popup.separator();
 
         getInput().populatePopup(popup);
+        if (!(this.input instanceof ClassInput)) {
+            popup.separator();
+
+            popup.menuItem("Remove", () -> {
+                ClassInput owner = this.input.getOwningClass();
+                owner.removeInput((MemberInput<?>) this.input);
+                Main.getTrinity().getEventManager().postEvent(new EventClassModified(this.input.getOwningClass()));
+                Main.getDisplayManager().addNotification(new Notification(NotificationType.SUCCESS, () -> "Class Structure", ColoredStringBuilder.create()
+                        .fmt("Removed {} in {}", this.input.getDisplayName().getName(), owner.getDisplayName().getName()).get()));
+
+                Main.getWindowManager().getWindowsOfType(DecompilerWindow.class).forEach(DecompilerWindow::updateClassStructure);
+            });
+        }
     }
 
     @Override
