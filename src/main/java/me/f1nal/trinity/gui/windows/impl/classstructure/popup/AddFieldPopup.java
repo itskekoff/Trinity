@@ -14,6 +14,7 @@ import me.f1nal.trinity.gui.viewport.notifications.Notification;
 import me.f1nal.trinity.gui.viewport.notifications.NotificationType;
 import me.f1nal.trinity.gui.windows.api.PopupWindow;
 import me.f1nal.trinity.gui.windows.impl.classstructure.popup.utils.DescriptorValidator;
+import me.f1nal.trinity.gui.windows.impl.entryviewer.impl.decompiler.DecompilerWindow;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.FieldNode;
@@ -100,6 +101,8 @@ public class AddFieldPopup extends PopupWindow {
             trinity.getEventManager().postEvent(new EventClassModified(this.classInput));
             Main.getDisplayManager().addNotification(new Notification(NotificationType.SUCCESS, () -> "Field generator", ColoredStringBuilder.create()
                     .fmt("Created field {} in {}", generateFieldPreview(), this.classInput.getDisplaySimpleName()).get()));
+            Main.getWindowManager().getWindowsOfType(DecompilerWindow.class).forEach(DecompilerWindow::updateClassStructure);
+
             close();
         }
         ImGui.sameLine();
@@ -166,30 +169,26 @@ public class AddFieldPopup extends PopupWindow {
     public Object getInitialValue() {
         if (initialValue.get().isEmpty()) return null;
         try {
-            Type type = Type.getType(fieldType.get());
+            Type type = Type.getType(fieldType.get().isEmpty() ? "I" : fieldType.get());
             return switch (type.getSort()) {
                 case Type.INT -> Integer.parseInt(initialValue.get());
                 case Type.LONG -> Long.parseLong(initialValue.get());
                 case Type.FLOAT -> Float.parseFloat(initialValue.get());
                 case Type.DOUBLE -> Double.parseDouble(initialValue.get());
                 case Type.BOOLEAN -> Boolean.parseBoolean(initialValue.get());
-                case Type.OBJECT -> initialValue.get(); // Для String и других объектов
+                case Type.OBJECT -> initialValue.get();
                 default -> null;
             };
         } catch (Exception e) {
-            return initialValue.get(); // Как строка, если парсинг не удался
+            return initialValue.get();
         }
     }
 
     private FieldNode createField() {
         String name = this.getFieldName();
-        String desc = this.getFieldType();
+        String desc = this.getFieldType().isEmpty() ? "I" : this.getFieldType();
         int access = this.getAccessFlags();
         Object value = this.getInitialValue();
-
-        if (desc.isEmpty()) {
-            desc = "I"; // По умолчанию int, если тип не указан
-        }
 
         return new FieldNode(access, name, desc, null, value);
     }

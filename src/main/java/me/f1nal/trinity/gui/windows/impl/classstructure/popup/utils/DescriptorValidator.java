@@ -7,7 +7,7 @@ import org.objectweb.asm.Type;
 public class DescriptorValidator {
     public static boolean validateMethodDescriptor(String descriptor, StringBuilder error) {
         if (descriptor.isEmpty()) {
-            return true; // Пустой дескриптор допустим (будет void по умолчанию)
+            return true;
         }
         try {
             Type.getMethodType(descriptor);
@@ -20,7 +20,7 @@ public class DescriptorValidator {
 
     public static boolean validateFieldDescriptor(String descriptor, StringBuilder error) {
         if (descriptor.isEmpty()) {
-            return true; // Пустой дескриптор допустим (будет int по умолчанию)
+            return true;
         }
         try {
             Type.getType(descriptor);

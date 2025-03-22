@@ -14,6 +14,7 @@ import me.f1nal.trinity.gui.viewport.notifications.Notification;
 import me.f1nal.trinity.gui.viewport.notifications.NotificationType;
 import me.f1nal.trinity.gui.windows.api.PopupWindow;
 import me.f1nal.trinity.gui.windows.impl.classstructure.popup.utils.DescriptorValidator;
+import me.f1nal.trinity.gui.windows.impl.entryviewer.impl.decompiler.DecompilerWindow;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.InsnList;
@@ -103,6 +104,7 @@ public class AddMethodPopup extends PopupWindow {
             trinity.getEventManager().postEvent(new EventClassModified(this.classInput));
             Main.getDisplayManager().addNotification(new Notification(NotificationType.SUCCESS, () -> "Method generator", ColoredStringBuilder.create()
                     .fmt("Created method {} in {}", generateMethodPreview(), this.classInput.getDisplayName().getName()).get()));
+            Main.getWindowManager().getWindowsOfType(DecompilerWindow.class).forEach(DecompilerWindow::updateClassStructure);
             close();
         }
         ImGui.sameLine();
@@ -189,7 +191,7 @@ public class AddMethodPopup extends PopupWindow {
 
     private MethodNode createMethod() {
         String name = this.getMethodName();
-        String desc = this.getDescriptor();
+        String desc = this.getDescriptor().isEmpty() ? "()V" : this.getDescriptor();
         int access = this.getAccessFlags();
         String[] exceptions = this.getExceptions();
 
