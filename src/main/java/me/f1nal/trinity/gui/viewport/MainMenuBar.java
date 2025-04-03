@@ -21,6 +21,7 @@ import me.f1nal.trinity.gui.windows.impl.constant.search.ConstantSearchTypeStrin
 import me.f1nal.trinity.gui.windows.impl.cp.ProjectBrowserFrame;
 import me.f1nal.trinity.gui.windows.impl.project.create.NewProjectFrame;
 import me.f1nal.trinity.gui.windows.impl.project.settings.ProjectSettingsWindow;
+import me.f1nal.trinity.gui.windows.impl.refactor.DeobfuscatorWindow;
 import me.f1nal.trinity.gui.windows.impl.refactor.GlobalRenameWindow;
 import me.f1nal.trinity.gui.windows.impl.themes.ThemeEditorFrame;
 import me.f1nal.trinity.gui.windows.impl.xref.search.XrefSearchFrame;
@@ -112,6 +113,8 @@ public class MainMenuBar {
             if (ImGui.beginMenu("Refactor")) {
                 if (ImGui.menuItem(FontAwesomeIcons.Gavel + " Global Rename")) {
                     getWindowManager().addStaticWindow(GlobalRenameWindow.class);
+                } else if (ImGui.menuItem(FontAwesomeIcons.Cannabis + " Deobfuscate")) {
+                    getWindowManager().addStaticWindow(DeobfuscatorWindow.class);
                 }
                 ImGui.endMenu();
             }

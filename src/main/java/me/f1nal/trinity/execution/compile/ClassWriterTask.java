@@ -83,9 +83,11 @@ public class ClassWriterTask {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             JarOutputStream jarOutputStream = new JarOutputStream(byteArrayOutputStream);
             for (Map.Entry<String, byte[]> entry : entryMap.entrySet()) {
-                jarOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
-                jarOutputStream.write(entry.getValue());
-                jarOutputStream.closeEntry();
+                try {
+                    jarOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
+                    jarOutputStream.write(entry.getValue());
+                    jarOutputStream.closeEntry();
+                } catch (Exception ohShit) {}
             }
             jarOutputStream.close();
             jarBytes = byteArrayOutputStream.toByteArray();

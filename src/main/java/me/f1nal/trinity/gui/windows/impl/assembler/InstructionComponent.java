@@ -91,7 +91,9 @@ public class InstructionComponent {
             float width = 0.F;
 
             for (ColoredString string : argument.getDetailsText()) {
-                ImVec2 textSize = ImGui.calcTextSize(string.getText());
+                String text = string.getText();
+                if (text == null) text = "<error>";
+                ImVec2 textSize = ImGui.calcTextSize(text);
                 width += textSize.x;
             }
 

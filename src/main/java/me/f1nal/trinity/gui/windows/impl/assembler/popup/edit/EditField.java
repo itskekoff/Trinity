@@ -19,7 +19,11 @@ public abstract class EditField<T> {
 
     public abstract void draw();
     public abstract void updateField();
-    
+
+    public void onClose() {
+
+    }
+
     /**
      * @return If the input in this field is valid and the instruction may be edited with this data.
      */

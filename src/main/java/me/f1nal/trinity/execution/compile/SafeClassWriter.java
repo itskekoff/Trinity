@@ -96,10 +96,10 @@ public class SafeClassWriter extends ClassWriter {
                 }
             }
         } catch (TypeNotPresentException e) {
-            console.warn("Type not found: {}. Fallback to java/lang/Object", e.typeName());
+            if (console != null) console.warn("Type not found: {}. Fallback to java/lang/Object", e.typeName());
             return "java/lang/Object";
         } catch (IOException e) {
-            console.warn("IO error for {} and {}. Fallback to java/lang/Object", type1, type2);
+            if (console != null) console.warn("IO error for {} and {}. Fallback to java/lang/Object", type1, type2);
             return "java/lang/Object";
         }
     }

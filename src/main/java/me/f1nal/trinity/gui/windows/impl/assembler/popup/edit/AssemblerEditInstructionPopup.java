@@ -53,6 +53,7 @@ public class AssemblerEditInstructionPopup extends PopupWindow {
             boolean disabled = !instruction.isValid();
             if (disabled) ImGui.beginDisabled();
             if (ImGui.button("Done")) {
+                this.instruction.getEditFieldList().forEach(EditField::onClose);
                 this.callback.accept(this.instruction);
                 this.close();
             }

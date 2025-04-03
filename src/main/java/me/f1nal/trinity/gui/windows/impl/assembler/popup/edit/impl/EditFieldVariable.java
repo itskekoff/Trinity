@@ -20,6 +20,9 @@ public class EditFieldVariable extends EditFieldText<Variable> {
         this.table = table;
     }
 
+    private String variableName;
+    private boolean createNew = false;
+
     @Override
     public void draw() {
         super.draw();
@@ -27,20 +30,30 @@ public class EditFieldVariable extends EditFieldText<Variable> {
         if (!this.isValidInput()) {
             List<String> variableNames = new ArrayList<>();
             String search = getText().get().toLowerCase();
+            this.variableName = search;
+
             for (Variable variable : table.getVariableMap()) {
                 String name = variable.getName();
-
                 if (search.isEmpty() || name.toLowerCase().contains(search)) {
                     variableNames.add(name);
                 }
             }
             if (variableNames.isEmpty()) {
-                ImGui.textColored(CodeColorScheme.NOTIFY_ERROR, "No variable found");
+                ImGui.textColored(CodeColorScheme.NOTIFY_WARN, "Create new variable");
+                this.createNew = true;
             } else {
+                this.createNew = false;
                 ImGui.pushStyleColor(ImGuiCol.Text, CodeColorScheme.VAR_REF);
                 ImGui.textWrapped(String.join(" ", variableNames));
                 ImGui.popStyleColor();
             }
+        }
+    }
+
+    @Override
+    public void onClose() {
+        if (this.createNew && !this.variableName.isBlank()) {
+            table.getVariableMap().add(new Variable(table, this.variableName));
         }
     }
 
