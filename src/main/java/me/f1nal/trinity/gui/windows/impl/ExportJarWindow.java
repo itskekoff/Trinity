@@ -33,14 +33,19 @@ public class ExportJarWindow extends StaticWindow {
         if (ImGui.button("Export")) {
             this.console.clear();
             this.classWriterTask = new ClassWriterTask(trinity.getExecution().getClassList(), trinity.getExecution().getResourceMap(), trinity, console, this.outputFile.getFile());
-            this.classWriterTask.build(progress -> this.progress = progress, () -> classWriterTask = null);
+            this.classWriterTask.build(progress -> this.progress = progress, this::reset);
         }
         if (disabled) ImGui.endDisabled();
         ImGui.sameLine();
+
         ImGui.progressBar(this.progress);
 
         ImGui.beginChild("ExportJarConsoleChld", 0, 0);
         console.draw();
         ImGui.endChild();
+    }
+
+    private void reset() {
+        this.classWriterTask = null;
     }
 }

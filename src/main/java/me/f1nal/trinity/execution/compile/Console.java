@@ -4,11 +4,14 @@ import imgui.ImGui;
 import me.f1nal.trinity.decompiler.output.colors.ColoredString;
 import me.f1nal.trinity.theme.CodeColorScheme;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Console {
     private final List<ColoredString> logs = new ArrayList<>();
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy/HH:mm");
 
     public void draw() {
         synchronized (logs) {
@@ -31,11 +34,21 @@ public class Console {
     }
 
     public void error(String info, String... args) {
-        this.addLog(CodeColorScheme.NOTIFY_ERROR, fmt(info, args));
+        String timestamp = LocalDateTime.now().format(TIME_FORMATTER);
+        String formattedMessage = String.format("[%s] (ERROR) %s", timestamp, fmt(info, args));
+        this.addLog(CodeColorScheme.NOTIFY_ERROR, formattedMessage);
     }
 
     public void warn(String info, String... args) {
-        this.addLog(CodeColorScheme.NOTIFY_WARN, fmt(info, args));
+        String timestamp = LocalDateTime.now().format(TIME_FORMATTER);
+        String formattedMessage = String.format("[%s] (WARN) %s", timestamp, fmt(info, args));
+        this.addLog(CodeColorScheme.NOTIFY_WARN, formattedMessage);
+    }
+
+    public void info(String info, String... args) {
+        String timestamp = LocalDateTime.now().format(TIME_FORMATTER);
+        String formattedMessage = String.format("[%s] (INFO) %s", timestamp, fmt(info, args));
+        this.addLog(CodeColorScheme.TEXT, formattedMessage);
     }
 
     private static String fmt(String format, String[] args) {
@@ -57,9 +70,5 @@ public class Console {
             }
         }
         return sb.toString();
-    }
-
-    public void info(String info, String... args) {
-        this.addLog(CodeColorScheme.TEXT, fmt(info, args));
     }
 }

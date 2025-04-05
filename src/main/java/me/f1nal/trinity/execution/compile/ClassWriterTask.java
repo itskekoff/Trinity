@@ -44,38 +44,59 @@ public class ClassWriterTask {
     }
 
     public void build(Consumer<Float> progressConsumer, Runnable finish) {
-        // make it so consumers are called without classes
-        if (classNodes.isEmpty()) throw new RuntimeException();
-
-        final Map<String, byte[]> entryMap = new HashMap<>(resources);
-        final AtomicInteger written = new AtomicInteger();
-        final int classSize = classNodes.size();
-
-        for (ClassInput classInput : classNodes) {
-            executorService.submit(() -> {
-                ClassNode classNode = classInput.getNode();
-
-                try {
-                    SafeClassWriter classWriter = new SafeClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS, this::getType, console);
-                    classNode.accept(classWriter);
-                    entryMap.put(classNode.name + ".class", classWriter.toByteArray());
-                } catch (Throwable throwable) {
-                    executorService.shutdown();
-                    throwable.printStackTrace();
-                    finish.run();
-                    console.error("Error in class %s: %s".formatted(classNode.name, throwable.getMessage()));
-                    return;
-                }
-
-                final int writtenCount = written.incrementAndGet();
-                if (writtenCount == classSize) {
-                    this.writeJarFile(entryMap);
-                    finish.run();
-                }
-                progressConsumer.accept((float) writtenCount / (float) classSize);
-            });
+        if (classNodes.isEmpty()) {
+            console.warn("Project contains only resources (empty classes), writing resources");
+            final int resourceSize = resources.size();
+            if (resourceSize == 0) {
+                console.warn("Project is empty, no classes or resources to write");
+                finish.run();
+                return;
+            }
+            final Map<String, byte[]> entryMap = new HashMap<>();
+            final AtomicInteger processed = new AtomicInteger();
+            for (Map.Entry<String, byte[]> resource : resources.entrySet()) {
+                executorService.submit(() -> {
+                    entryMap.put(resource.getKey(), resource.getValue());
+                    int processedCount = processed.incrementAndGet();
+                    progressConsumer.accept((float) processedCount / (float) resourceSize);
+                    if (processedCount == resourceSize) {
+                        this.writeJarFile(entryMap);
+                        progressConsumer.accept(0f);
+                        finish.run();
+                    }
+                });
+            }
+        } else {
+            final Map<String, byte[]> entryMap = new HashMap<>(resources);
+            final AtomicInteger written = new AtomicInteger();
+            final int classSize = classNodes.size();
+            for (ClassInput classInput : classNodes) {
+                executorService.submit(() -> {
+                    ClassNode classNode = classInput.getNode();
+                    try {
+                        SafeClassWriter classWriter = new SafeClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS, this::getType, console);
+                        classNode.accept(classWriter);
+                        entryMap.put(classNode.name + ".class", classWriter.toByteArray());
+                    } catch (Throwable throwable) {
+                        executorService.shutdown();
+                        throwable.printStackTrace();
+                        finish.run();
+                        console.error("Error in class %s: %s".formatted(classNode.name, throwable.getMessage()));
+                        return;
+                    }
+                    int writtenCount = written.incrementAndGet();
+                    if (writtenCount == classSize) {
+                        this.writeJarFile(entryMap);
+                        progressConsumer.accept(0f);
+                        finish.run();
+                        return;
+                    }
+                    progressConsumer.accept((float) writtenCount / (float) classSize);
+                });
+            }
         }
     }
+
 
     private void writeJarFile(Map<String, byte[]> entryMap) {
         byte[] jarBytes = null;
